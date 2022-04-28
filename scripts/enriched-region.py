@@ -19,7 +19,7 @@ plt.rcParams['svg.fonttype'] = 'none'
 def _generate_null(xmat,
                    labels,
                    n_shuffle,
-                   )->np.ndarray:
+                   )->np.ndarray:   //计算排列平均值
 
     uni_labs = np.unique(labels)
     mu_null = np.zeros((uni_labs.shape[0],
@@ -30,7 +30,7 @@ def _generate_null(xmat,
     for it in range(n_shuffle):
         idx = np.random.permutation(xmat.shape[0])
         for num,lab in enumerate(uni_labs):
-            mu_null[num,:,it] = xmat[idx[labels==lab],:].mean(axis = 0)
+            mu_null[num,:,it] = xmat[idx[labels==lab],:].mean(axis = 0)  //排列平均值
 
         if it % 1000 == 0 and it >= 1000:
             print("\r Iter : {}".format(it),end="")
@@ -43,22 +43,22 @@ def _generate_null(xmat,
 def enrichment(xmat : np.ndarray,
                labels : np.ndarray,
                n_shuffle : int = 10000,
-               )->dict:
+               )->dict:               // 计算富集分数
 
     uni_labs = np.unique(labels,)
     n_regions = uni_labs.shape[0]
     n_feature = xmat.shape[1]
-    true_mean = np.zeros((n_regions,n_feature,1))
+    true_mean = np.zeros((n_regions,n_feature,1)) 
 
     for num,lab in enumerate(uni_labs):
-        true_mean[num,:,0] = xmat[labels == lab,:].mean(axis=0)
+        true_mean[num,:,0] = xmat[labels == lab,:].mean(axis=0)     //真实平均值
 
-    null_dist = _generate_null(xmat,labels,n_shuffle)
+    null_dist = _generate_null(xmat,labels,n_shuffle)      //排列平均值
 
     diff_dist = true_mean - null_dist
     std = diff_dist.std(axis = 2)
     diff_dist = diff_dist.mean(axis =2)
-    diff_dist /= std
+    diff_dist /= std                                    //最终富集分数
 
 
     return {'vals':diff_dist,'regions':uni_labs}
@@ -86,7 +86,7 @@ def make_pallete(enr_res : dict,
                  feat_names : Union[np.ndarray,list],
                  min_size = 1,
                  max_size = 520,
-                 )->Tuple[plt.Figure,plt.Axes]:
+                 )->Tuple[plt.Figure,plt.Axes]:    //画图
 
 
     xx = enr_res['vals']
