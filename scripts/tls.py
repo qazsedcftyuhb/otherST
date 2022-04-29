@@ -57,8 +57,8 @@ def compute_tls_score(prop : pd.DataFrame,
     """compute tls score from prop file"""
 
     n_spots = prop.shape[0]
-    pos_1 = np.argmax(prop.columns == b_name)
-    pos_2 = np.argmax(prop.columns == t_name)
+    pos_1 = np.argmax(prop.columns == b_name)    
+    pos_2 = np.argmax(prop.columns == t_name)    
 
     jprod = np.zeros(n_spots)
 
@@ -69,8 +69,8 @@ def compute_tls_score(prop : pd.DataFrame,
         nprod = prod / prod.sum()
         N = prod.shape[0]
 
-        jprod[s] = nprod[pos_1,pos_2] * 2
-        jprod[s] -= (nprod.sum() / (0.5*(N**2 + N)))
+        jprod[s] = nprod[pos_1,pos_2] * 2        //原始TLS分数
+        jprod[s] -= (nprod.sum() / (0.5*(N**2 + N)))       //调整后的TLS分数
 
 
     jprod = pd.DataFrame(jprod,
@@ -86,10 +86,10 @@ def fit_tls_model(Y : pd.DataFrame,
 
     """fit tls model"""
 
-    mod = sm.OLS(Y.values,x.values)
+    mod = sm.OLS(Y.values,x.values)         //用普通最小二乘法估计线性模型y = β0 + βTx
     res = mod.fit_regularized(L1_wt = 0,
                             alpha = alpha,
-                            )
+                            )    
 
     coefs = res.params
 
@@ -103,11 +103,11 @@ def get_inflection_point(times : np.ndarray,
                          sigma : float = 10,
                          min_genes : int = 1,
                          n_fail : int = 100,
-                         )-> int:
+                         )-> int:             //获取TLS signature基因
 
-    f_times = gaussian_filter(times,sigma)
-    f_d2 = gaussian_filter(np.gradient(np.gradient(f_times)),sigma)
-    first = np.argmax(f_d2 > 0)
+    f_times = gaussian_filter(times,sigma)  //高斯滤波器
+    f_d2 = gaussian_filter(np.gradient(np.gradient(f_times)),sigma)    
+    first = np.argmax(f_d2 > 0)    //取0以上的系数
     f_d2[0:first] = 1
     ipoint = np.argmax(f_d2 <= 0)
 
