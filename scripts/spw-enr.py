@@ -67,7 +67,7 @@ def get_enr(expr : pd.DataFrame,
         cm[1,0] = len(top_set.difference(comp_set))
         cm[1,1] = len(all_set.difference(union))
 
-        _,pvals = fisher_exact(cm)
+        _,pvals = fisher_exact(cm)     //
         score.append( -np.log2(pvals))
 
     return np.array(score)
